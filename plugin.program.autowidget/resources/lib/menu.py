@@ -1,5 +1,4 @@
 import xbmc
-import xbmcaddon
 import xbmcgui
 
 import random
@@ -26,8 +25,6 @@ sync = utils.get_art('sync.png')
 tools = utils.get_art('tools.png')
 unpack = utils.get_art('unpack.png')
 
-_addon = xbmcaddon.Addon()
-
 label_warning_shown = utils.get_setting_bool('label.warning')
 
 
@@ -35,7 +32,7 @@ def _warn():
     dialog = xbmcgui.Dialog()
     dialog.ok('AutoWidget', utils.get_string(32073))
     
-    _addon.setSetting('label.warning', 'true')
+    utils.set_setting('label.warning', 'true')
     label_warning_shown = True
 
 
@@ -43,15 +40,15 @@ def root_menu():
     directory.add_menu_item(title=32007,
                             params={'mode': 'group'},
                             art=folder,
-                            isFolder=True)
+                            is_folder=True)
     directory.add_menu_item(title=32074,
                             params={'mode': 'widget'},
                             art=folder,
-                            isFolder=True)
+                            is_folder=True)
     directory.add_menu_item(title=32008,
                             params={'mode': 'tools'},
                             art=tools,
-                            isFolder=True)
+                            is_folder=True)
     return True, 'AutoWidget'
                             
                             
@@ -81,11 +78,11 @@ def my_groups_menu():
                                                              if group_type == 'shortcut'
                                                              else folder_sync),
                                     cm=cm,
-                                    isFolder=True)
+                                    is_folder=True)
     else:
         directory.add_menu_item(title=32068,
                                 art=alert,
-                                isFolder=False)
+                                is_folder=False)
     return True, utils.get_string(32007)
     
     
@@ -118,7 +115,7 @@ def group_menu(group_id, target, _id):
                                     info=path.get('info'),
                                     art=path.get('art') or art,
                                     cm=cm,
-                                    isFolder=False)
+                                    is_folder=False)
         if target == 'widget' and _window != 'home':
             directory.add_separator(title=32010, char='/')
             
@@ -129,7 +126,7 @@ def group_menu(group_id, target, _id):
                                             'group': group_id,
                                             'id': six.text_type(_id)},
                                     art=folder_sync,
-                                    isFolder=True)
+                                    is_folder=True)
             directory.add_menu_item(title=utils.get_string(32076)
                                           .format(group_name, _id),
                                     params={'mode': 'path',
@@ -137,11 +134,11 @@ def group_menu(group_id, target, _id):
                                             'group': group_id,
                                             'id': six.text_type(_id)},
                                     art=folder_next,
-                                    isFolder=True)
+                                    is_folder=True)
     else:
         directory.add_menu_item(title=32032,
                                 art=alert,
-                                isFolder=False)
+                                is_folder=False)
     
     return True, group_name
     
@@ -205,11 +202,11 @@ def active_widgets_menu():
                                     art=art,
                                     params=params,
                                     cm=cm[1:] if not action else cm,
-                                    isFolder=True)
+                                    is_folder=True)
     else:
         directory.add_menu_item(title=32072,
                                 art=alert,
-                                isFolder=False)
+                                is_folder=False)
 
     return True, utils.get_string(32074)
     
@@ -219,11 +216,11 @@ def tools_menu():
                             params={'mode': 'force'},
                             art=refresh,
                             info={'plot': utils.get_string(32020)},
-                            isFolder=False)
+                            is_folder=False)
     directory.add_menu_item(title=32064,
                             params={'mode': 'wipe'},
                             art=remove,
-                            isFolder=False)
+                            is_folder=False)
     return True, utils.get_string(32008)
     
     
@@ -281,12 +278,12 @@ def random_path(group_id):
                                     params={'mode': 'force'},
                                     art=unpack,
                                     info={'plot': utils.get_string(32014)},
-                                    isFolder=False)
+                                    is_folder=False)
             return True, group_name
     else:
         directory.add_menu_item(title=32032,
                                 art=alert,
-                                isFolder=False)
+                                is_folder=False)
         return False, group_name
     
     
@@ -315,12 +312,12 @@ def next_path(group_id):
                                     params={'mode': 'force'},
                                     art=unpack,
                                     info={'plot': utils.get_string(32014)},
-                                    isFolder=False)
+                                    is_folder=False)
             return True, group_name
     else:
         directory.add_menu_item(title=32032,
                                 art=alert,
-                                isFolder=False)
+                                is_folder=False)
         return False, group_name
 
 

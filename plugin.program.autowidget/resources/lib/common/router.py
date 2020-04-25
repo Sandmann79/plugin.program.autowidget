@@ -17,21 +17,19 @@ from resources.lib.common import utils
 
 def _log_params(_plugin, _handle, _params):
     params = dict(parse_qsl(_params))
-    
     logstring = ''
     
     for param in params:
-        logstring += '[ {0}: {1} ] '.format(param, params[param])
+        logstring += '[ {0}: {1} ]'.format(param, params[param])
     
-    if not logstring:
-        logstring = '[ Root Menu ]'
+    if not params:
+        logstring = '[ : ]'
 
     utils.log(logstring, level=xbmc.LOGNOTICE)
 
     return params
     
 def dispatch(_plugin, _handle, _params):
-    _handle = int(_handle)
     params = _log_params(_plugin, _handle, _params)
     
     category = 'AutoWidget'
@@ -49,7 +47,6 @@ def dispatch(_plugin, _handle, _params):
     
     if not mode:
         is_dir, category = menu.root_menu()
-        xbmcplugin.addSortMethod(_handle, xbmcplugin.SORT_METHOD_UNSORTED)
     elif mode == 'manage':
         if action == 'add_group':
             manage.add_group(target)
@@ -71,13 +68,10 @@ def dispatch(_plugin, _handle, _params):
     elif mode == 'group':
         if not group:
             is_dir, category = menu.my_groups_menu()
-            xbmcplugin.addSortMethod(_handle, xbmcplugin.SORT_METHOD_LABEL)
         elif target:
             is_dir, category = menu.group_menu(group, target, _id)
-            xbmcplugin.addSortMethod(_handle, xbmcplugin.SORT_METHOD_UNSORTED)
     elif mode == 'widget':
         is_dir, is_category = menu.active_widgets_menu()
-        xbmcplugin.addSortMethod(_handle, xbmcplugin.SORT_METHOD_UNSORTED)
     elif mode == 'refresh':
         if not target:
             refresh.refresh_paths(notify=True)
@@ -85,13 +79,10 @@ def dispatch(_plugin, _handle, _params):
             refresh.refresh(target, force=True)
     elif mode == 'tools':
         is_dir, category = menu.tools_menu()
-        xbmcplugin.addSortMethod(_handle, xbmcplugin.SORT_METHOD_UNSORTED)
     elif mode == 'force':
         refresh.refresh_paths(notify=True, force=True)
     elif mode == 'wipe':
         utils.wipe()
-    elif mode == 'clean':
-        manage.clean()
 
     if is_dir:
         xbmcplugin.setPluginCategory(_handle, category)

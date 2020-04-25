@@ -2,12 +2,10 @@ import xbmc
 import xbmcaddon
 import xbmcgui
 
-import ast
 import codecs
 import io
 import json
 import os
-import re
 import shutil
 import string
 import sys
@@ -46,9 +44,12 @@ info_types = ['artist', 'albumartist', 'genre', 'year', 'rating',
               'plotoutline', 'originaltitle', 'lastplayed', 'writer', 'studio',
               'country', 'imdbnumber', 'premiered', 'productioncode', 'runtime',
               'firstaired', 'episode', 'showtitle', 'artistid', 'albumid',
-              'tvshowid', 'setid', 'watchedepisodes', 'displayartist', 'mimetype',
-              'albumartistid', 'description', 'albumlabel', 'sorttitle', 'episodeguide',
-              'dateadded', 'lastmodified', 'specialsortseason', 'specialsortepisode']
+              'tvshowid', 'setid', 'watchedepisodes', 'displayartist',
+              'albumartistid', 'description', 'albumlabel', 'sorttitle',
+              'dateadded', 'lastmodified', 'specialsortseason', 'mimetype', 
+              'episodeguide', 'specialsortepisode']
+              
+info_list_types = ['artist', 'cast']
               
 art_types = ['banner', 'clearart', 'clearlogo', 'fanart', 'icon', 'landscape',
              'poster', 'thumb']
@@ -84,34 +85,23 @@ def get_skin_string(string):
     
     
 def get_art(filename):
-    art = {}
-    for i in art_types:
-        path = os.path.join(_art_path, i, filename)
-        if os.path.exists(path):
-            art[i] = path
-    
-    return art
+    return {i: os.path.join(_art_path, i, filename) for i in art_types}
     
     
 def get_active_window():
-    xml_file = xbmc.getInfoLabel('Window.Property(xmlfile)').lower()
-
     if xbmc.getCondVisibility('Window.IsMedia()'):
         return 'media'
-    elif 'dialog' in xml_file:
-        return 'dialog'
     elif xbmc.getCondVisibility('Window.IsActive(home)'):
         return 'home'
-    else:
-        pass
         
         
 def update_container(reload=False, _type=''):
-    xbmc.executebuiltin('Container.Refresh()')
     if _type == 'shortcut':
         xbmc.executebuiltin('UpdateLibrary(video,AutoWidget)')
     if reload:
         xbmc.executebuiltin('ReloadSkin()')
+        
+    xbmc.executebuiltin('Container.Refresh()')
 
         
 def prettify(elem):
@@ -131,9 +121,6 @@ def get_valid_filename(filename):
                                                               'ignore').decode()
     
     cleaned_filename = ''.join(c for c in cleaned_filename if c in whitelist)
-    if len(cleaned_filename) > char_limit:
-        print('Warning, filename truncated because it was over {} characters. '
-              'Filenames may no longer be unique'.format(char_limit))
               
     return cleaned_filename[:char_limit]    
     
@@ -155,18 +142,16 @@ def convert(input):
 
 
 def remove_file(file):
-    if os.path.exists(file):
-        try:
-            os.remove(file)
-        except Exception as e:
-            log('Could not remove {}: {}'.format(file, e),
-                level=xbmc.LOGERROR)
+    try:
+        os.remove(file)
+    except Exception as e:
+        log('Could not remove {}: {}'.format(file, e), level=xbmc.LOGERROR)
 
 
 def read_file(file):
     content = None
     if os.path.exists(file):
-        with io.open(os.path.join(_addon_path, file), 'r', encoding='utf-8') as f:
+        with io.open(file, 'r', encoding='utf-8') as f:
             try:
                 content = f.read()
             except Exception as e:
@@ -193,7 +178,7 @@ def write_file(file, content):
 def read_json(file):
     data = None
     if os.path.exists(file):
-        with codecs.open(os.path.join(_addon_path, file), 'r', encoding='utf-8') as f:
+        with codecs.open(file, 'r', encoding='utf-8') as f:
             try:
                 content = six.ensure_text(f.read())
                 data = json.loads(content)
